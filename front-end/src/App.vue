@@ -42,6 +42,8 @@ export default {
       selectedShape: null,
       startShape: null,
       endShape: null,
+
+      
     };
   },
   methods: {
@@ -67,28 +69,64 @@ export default {
       }
     },
     drawCircle(x, y) {
+      //request backend and get the queueID and put it below text
+      const circleID = 0; // replace it with the return data from backend
       const circle = new Konva.Circle({
         x,
         y,
-        radius: 50,
-        fill: 'red',
+        radius: 25,
+        fill: 'orange',
         draggable: false,
       });
 
       this.layer.add(circle);
+      const text = new Konva.Text({
+          x: x , // Adjust the x-coordinate based on your design
+          y: y, // Adjust the y-coordinate based on your design
+          text: 'Q' + circleID,
+          fontSize: 12,
+          fill: 'black',
+          width: 40, // Set the width of the text box
+          align: 'center',
+      });
+
+      // Center the text inside the circle
+      text.offsetX(text.width() / 2);
+      text.offsetY(text.height() / 2);
+
+      // Add the text to the same layer
+      this.layer.add(text);
       this.stage.draw();
     },
     drawSquare(x, y) {
+      //request backend and get the machineID and put it below text
+      const squareID = 1; // replace it with the return data from backend
       const square = new Konva.Rect({
         x,
         y,
-        width: 100,
-        height: 100,
-        fill: 'blue',
+        width: 50,
+        height: 50,
+        fill: 'grey',
         draggable: false,
       });
 
       this.layer.add(square);
+      const text = new Konva.Text({
+          x: x+25 , // Adjust the x-coordinate based on your design
+          y: y+25, // Adjust the y-coordinate based on your design
+          text: 'M' + squareID,
+          fontSize: 12,
+          fill: 'white',
+          width: 40, // Set the width of the text box
+          align: 'center',
+      });
+
+      // Center the text inside the circle
+      text.offsetX(text.width() / 2);
+      text.offsetY(text.height() / 2);
+
+      // Add the text to the same layer
+      this.layer.add(text);
       this.stage.draw();
     },
     handleConnectClick(clickX, clickY) {
