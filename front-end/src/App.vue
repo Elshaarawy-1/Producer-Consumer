@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card theme="dark">
 
       <v-sheet v-if="productCount!=null"
     class="d-flex align-center justify-center flex-wrap text-center mx-auto px-4"
@@ -14,7 +14,7 @@
       <h2 class="text-h4 font-weight-black text-orange">NUMBER OF PRODUCTS: {{productCount}}</h2>
     </div>
   </v-sheet>
-    <v-layout>
+    <v-layout theme="dark">
     <div @click="handleCanvasClick" id="konva-container"></div>
       <v-navigation-drawer
         v-model="drawer"
@@ -168,10 +168,11 @@ export default {
     async drawCircle(x, y) {
       try {
         // Make an asynchronous request to the backend
-        const response = await axios.get('http://localhost:5000/createqueue');
+        // const response = await axios.get('http://localhost:5000/createqueue');
 
         // Extract the ID from the response data
-        const circleID = response.data;
+        // const circleID = response.data;
+        const circleID = 1;
         console.log(circleID);
 
         // Create the Konva circle
@@ -240,7 +241,7 @@ export default {
           width: 50,
           height: 50,
           id: 'M'+squareID, // will be used to identify the square later 
-          fill: 'grey',
+          fill: '#864AF9',
           draggable: false,
         });
 
@@ -338,8 +339,8 @@ export default {
           to.x + -radius * Math.cos(angle),
           to.y + radius * Math.sin(angle),
         ],
-        fill: 'black',
-        stroke: 'black',
+        fill: 'white',
+        stroke: 'white',
         strokeWidth: 2,
       });
 
