@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+// Memento Originator
 public class SimulationService {
     private HashMap<Integer,Queue> queues = new HashMap<>();
 
@@ -68,8 +69,9 @@ public class SimulationService {
     public void startSimulation() {
         if (!isSimulationRunning) {
             // Initialize and start threads for machines
-            for (Map.Entry<Integer, Machine> machineEntry : machines.entrySet()) {
-                Thread machineThread=new Thread(machineEntry.getValue());
+            for (Machine machine : machines.values()) {
+                machine.addObserver(new ReplayCareTaker(this));
+                Thread machineThread=new Thread(machine);
                 machineThread.start();
             }
             // Set the simulation state to running
@@ -80,8 +82,8 @@ public class SimulationService {
     public void stopSimulation() {
         if (isSimulationRunning) {
             // Stop threads for machines
-            for (Map.Entry<Integer, Machine> machineEntry : machines.entrySet()) {
-                Thread machineThread=new Thread(machineEntry.getValue());
+            for (Machine machine : machines.values()) {
+                Thread machineThread=new Thread(machine);
                 machineThread.interrupt();
             }
 
@@ -127,5 +129,36 @@ public class SimulationService {
         machine.setInputQueue(inputQueue);
         machines.put(machineId,machine);
     }
+    public SimulationMemento takeSnapshot() {
+        // Capture snapshot of the simulation state
+        List<QueueMemento> queueMementos = new ArrayList<>();
+        List<MachineMemento> machineMementos = new ArrayList<>();
 
+        // Capture state of queues
+        for (Queue queue : queues.values()) {
+            queueMementos.add(new QueueMemento(queue.getId(), queue.getCurrentNumberOfProducts()));
+        }
+
+        // Capture state of machines
+        for (Machine machine : machines.values()) {
+            machineMementos.add(new MachineMemento(machine.getId(), machine.getCurrentColor()));
+        }
+
+        // Create a SimulationMemento with captured state
+        return new SimulationMemento(queueMementos, machineMementos);
+    }
+
+    public HashMap<Integer, Machine> getMachines() {
+        return machines;
+    }
+
+    public HashMap<Integer, Queue> getQueues() {
+        return queues;
+    }
+    public void updateQueueById(int id, Queue Q){
+        queues.put(id,Q);
+    }
+    public void updateMachineById(int id, Machine M){
+        machines.put(id,M);
+    }
 }

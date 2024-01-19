@@ -1,5 +1,7 @@
 package com.csed.producerconsumer.Clients;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class Machine implements Runnable {
@@ -11,12 +13,13 @@ public class Machine implements Runnable {
 
     private boolean isReady = true;
     private long machineServiceTime;
+    private List<MachineObserver> observers = new ArrayList<>();
 
     public Machine(int id) {
         this.id = id;
         this.currentColor=this.defaultColor;
-        // Example: Random processing time between 500 and 1500 milliseconds
-        this.machineServiceTime=new Random().nextInt(1000) + 500;
+        // Random processing time between 1500 and 4500 milliseconds
+        this.machineServiceTime=new Random().nextInt(3000) + 1500;
     }
 
     public void setInputQueue(Queue inputQueue) {
@@ -48,6 +51,8 @@ public class Machine implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            // Change machine color to product color
+            this.currentColor = product.getColor();
 
             // Simulate processing time
             try {
@@ -55,14 +60,8 @@ public class Machine implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-            // Change machine color to product color
-            this.currentColor = product.getColor();
-
-            // Notify the UI or other components about the simulation state
-            printMachineState();
-            // You may use observers or other mechanisms for this purpose
-            // notifySimulationUpdate();
+            notifyObservers();
+            //printMachineState();
 
             // Produce the finished product by adding it to the output queue
             outputQueue.enqueue(product);
@@ -78,9 +77,20 @@ public class Machine implements Runnable {
             }
 
             // Notify the UI or other components about the simulation state
-            printMachineState();
+            notifyObservers();
+            //printMachineState();
             // You may use observers or other mechanisms for this purpose
             // notifySimulationUpdate()
+        }
+    }
+    // Method to add observers
+    public void addObserver(MachineObserver observer) {
+        observers.add(observer);
+    }
+    // Method to notify observers
+    private void notifyObservers() {
+        for (MachineObserver observer : observers) {
+            observer.update(this);
         }
     }
     private void printMachineState() {
@@ -99,5 +109,21 @@ public class Machine implements Runnable {
 
     public Queue getOutputQueue() {
         return outputQueue;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getCurrentColor() {
+        return currentColor;
+    }
+
+    public void setCurrentColor(String currentColor) {
+        this.currentColor = currentColor;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
