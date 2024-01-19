@@ -38,6 +38,7 @@
 
 <script>
 import Konva from 'konva';
+import axios from 'axios';
 
 export default {
   data() {
@@ -52,6 +53,7 @@ export default {
         { title: 'Increase Product', value: 'add', icon: 'mdi-plus-circle' },
         { title: 'Decrease Product', value: 'minus', icon: 'mdi-minus-circle' },
         { title: 'Reload', value: 'reload', icon: 'mdi-reload' },
+        { title: 'Clear', value: 'clear', icon: 'mdi-layers-off' },
       ],
       stage: null,
       layer: null,
@@ -68,7 +70,7 @@ export default {
   methods: {
     isItemActive(value) {
       // return value !== 'add' && value !== 'minus';
-      if (value === 'add' || value === 'minus') {
+      if (value === 'add' || value === 'minus' || value === 'play' || value === 'reload' || value === 'clear') {
         return false;
       }
       return null
@@ -90,6 +92,56 @@ export default {
       else if(this.selectedShape === 'minus'){
         this.removeProduct();
       }
+      else if(this.selectedShape === 'play'){
+        this.play();
+      }
+      else if(this.selectedShape === 'reload'){
+        this.reload();
+      }
+      else if(this.selectedShape === 'clear'){
+        this.clear();
+      }
+    },
+    play() {
+      axios.post('http://localhost:5000/start', {
+        numberOfProducts: this.productCount,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    reload(){
+      axios.post('http://localhost:5000/reload', {
+      })
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
+    clear(){
+      axios.post('http://localhost:5000/clear', {
+      })
+        .then((response) => {
+          console.log(response);
+          if(response.data == "success"){
+            this.stage.destroyChildren();
+            this.stage.draw();
+            this.circles = [];
+            this.squares = [];
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     addProduct(){
       this.productCount++;
@@ -113,83 +165,124 @@ export default {
         this.drawSquare(clickX, clickY);
       }
     },
-    drawCircle(x, y) {
-      //request backend and get the queueID and put it below text
-      const circleID = 0; // replace it with the return data from backend
-      const circle = new Konva.Circle({
-        x,
-        y,
-        radius: 25,
-        fill: 'orange',
-        id: circleID, // will be used to identify the circle later 
-        draggable: false,
-      });
+    async drawCircle(x, y) {
+      try {
+        // Make an asynchronous request to the backend
+        const response = await axios.get('http://localhost:5000/createqueue');
 
-      circle.on('click', () => {
-        this.handleShapeClick(circle);
-      });
+        // Extract the ID from the response data
+        const circleID = response.data;
+        console.log(circleID);
 
-      this.layer.add(circle);
-      const text = new Konva.Text({
-        x,
-        y,
-        text: 'Q' + circleID,
-        fontSize: 12,
-        fill: 'black',
-        width: 40,
-        align: 'center',
-      });
-      text.offsetX(text.width() / 2);
-      text.offsetY(text.height() / 2);
-      text.on('click', () => {
-        this.handleShapeClick(circle);
-      });
+        // Create the Konva circle
+        const circle = new Konva.Circle({
+          x,
+          y,
+          radius: 25,
+          fill: 'orange',
+          id: 'Q'+circleID, // will be used to identify the circle later 
+          draggable: false,
+        });
 
-      this.layer.add(text);
-      this.stage.draw();
-      this.circles.push({ id: circleID, circle, text });
+        // Attach click event handler to the circle
+        circle.on('click', () => {
+          this.handleShapeClick(circle);
+        });
+
+        // Add the circle to the layer
+        this.layer.add(circle);
+
+        // Create the Konva text
+        const text = new Konva.Text({
+          x,
+          y,
+          text: 'Q' + circleID,
+          fontSize: 12,
+          fill: 'black',
+          width: 40,
+          align: 'center',
+        });
+        text.offsetX(text.width() / 2);
+        text.offsetY(text.height() / 2);
+
+        // Attach click event handler to the text
+        text.on('click', () => {
+          this.handleShapeClick(circle);
+        });
+
+        // Add the text to the layer
+        this.layer.add(text);
+
+        // Redraw the stage
+        this.stage.draw();
+
+        // Add the circle and text information to the circles array
+        this.circles.push({ id: circleID, circle, text });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     },
 
-    drawSquare(x, y) {
-      //request backend and get the machineID and put it below text
-      const squareID = 1; // replace it with the return data from backend
-      const square = new Konva.Rect({
-        x,
-        y,
-        width: 50,
-        height: 50,
-        id: squareID, // will be used to identify the square later 
+    async drawSquare(x, y) {
+      try {
+        // Make an asynchronous request to the backend
+        // const response = await axios.get('http://localhost:5000/createmachine');
 
-        fill: 'grey',
-        draggable: false,
-      });
+        // Extract the ID from the response data
+        // const squareID = response.data;
+        const squareID = 1;
+        console.log(squareID);
 
-      square.on('click', () => {
-        this.handleShapeClick(square);
-      });
+        // Create the Konva square
+        const square = new Konva.Rect({
+          x,
+          y,
+          width: 50,
+          height: 50,
+          id: 'M'+squareID, // will be used to identify the square later 
+          fill: 'grey',
+          draggable: false,
+        });
 
-      this.layer.add(square);
-      const text = new Konva.Text({
-        x: x + 25, 
-        y: y + 25, 
-        text: 'M' + squareID,
-        fontSize: 12,
-        fill: 'white',
-        width: 40, 
-        align: 'center',
-      });
+        // Attach click event handler to the square
+        square.on('click', () => {
+          this.handleShapeClick(square);
+        });
 
-      text.offsetX(text.width() / 2);
-      text.offsetY(text.height() / 2);
-      text.on('click', () => {
-        this.handleShapeClick(square);
-      });
+        // Add the square to the layer
+        this.layer.add(square);
 
-      this.layer.add(text);
-      this.stage.draw();
-      this.squares.push({ id: squareID, square, text });
+        // Create the Konva text
+        const text = new Konva.Text({
+          x: x + 25,
+          y: y + 25,
+          text: 'M' + squareID,
+          fontSize: 12,
+          fill: 'white',
+          width: 40,
+          align: 'center',
+        });
+
+        text.offsetX(text.width() / 2);
+        text.offsetY(text.height() / 2);
+
+        // Attach click event handler to the text
+        text.on('click', () => {
+          this.handleShapeClick(square);
+        });
+
+        // Add the text to the layer
+        this.layer.add(text);
+
+        // Redraw the stage
+        this.stage.draw();
+
+        // Add the square and text information to the squares array
+        this.squares.push({ id: squareID, square, text });
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
     },
-
     handleShapeClick(shape) {
       console.log('Shape clicked');
       this.lastshapeclicked = shape;
@@ -211,47 +304,68 @@ export default {
         }
       }
     },
+    drawArrow() {
+      const dx = this.endShape.x() - this.startShape.x();
+      const dy = this.endShape.y() - this.startShape.y();
+      let angle = Math.atan2(-dy, dx);
+      // console.log(this.startShape.id(), this.endShape.id());
+
+      const radius = 48;
+      let from = {
+        x: this.startShape.x(),
+        y: this.startShape.y(),
+      };
+
+      let to = {
+        x: this.endShape.x(),
+        y: this.endShape.y(),
+      };
+
+      if (this.startShape.getClassName() === 'Rect') {
+        from.x += 25;
+        from.y += 25;
+      }
+
+      if (this.endShape.getClassName() === 'Rect') {
+        to.x += 25;
+        to.y += 25;
+      }
+
+      const arrow = new Konva.Arrow({
+        points: [
+          from.x + -radius * Math.cos(angle + Math.PI),
+          from.y + radius * Math.sin(angle + Math.PI),
+          to.x + -radius * Math.cos(angle),
+          to.y + radius * Math.sin(angle),
+        ],
+        fill: 'black',
+        stroke: 'black',
+        strokeWidth: 2,
+      });
+
+      this.layer.add(arrow);
+      this.stage.draw();
+    },
     connectShapes() {
       if (this.startShape && this.endShape && this.startShape !== this.endShape) {
-        const dx = this.endShape.x() - this.startShape.x();
-        const dy = this.endShape.y() - this.startShape.y();
-        let angle = Math.atan2(-dy, dx);
-
-        const radius = 48;
-        let from = {
-          x: this.startShape.x(),
-          y: this.startShape.y(),
-        };
-
-        let to = {
-          x: this.endShape.x(),
-          y: this.endShape.y(),
-        };
-
-        if (this.startShape.getClassName() === 'Rect') {
-          from.x += 25;
-          from.y += 25;
-        }
-
-        if (this.endShape.getClassName() === 'Rect') {
-          to.x += 25;
-          to.y += 25;
-        }
-
-        const arrow = new Konva.Arrow({
-          points: [
-            from.x + -radius * Math.cos(angle + Math.PI),
-            from.y + radius * Math.sin(angle + Math.PI),
-            to.x + -radius * Math.cos(angle),
-            to.y + radius * Math.sin(angle),
-          ],
-          fill: 'black',
-          stroke: 'black',
-          strokeWidth: 2,
+        const startShapeId = this.startShape.id();
+        const endShapeId = this.endShape.id();
+        this.drawArrow();
+        axios.post('http://localhost:5000/connect', {
+            source: startShapeId,
+            destination: endShapeId,
+        }, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then((response) => {
+            console.log(response);
+            this.drawArrow();
+        })
+        .catch((error) => {
+            console.error(error);
         });
-
-        this.layer.add(arrow);
-        this.stage.draw();
       }
   },
   detect_queue(id) {
