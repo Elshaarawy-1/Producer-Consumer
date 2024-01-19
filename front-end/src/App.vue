@@ -1,5 +1,18 @@
 <template>
   <v-card>
+      <v-sheet v-if="productCount!=null"
+    class="d-flex align-center justify-center flex-wrap text-center mx-auto px-4"
+    elevation="20"
+    height="50"
+    rounded
+    max-width="800"
+    width="100%"
+  >
+    <div>
+      <h2 class="text-h4 font-weight-black text-orange">NUMBER OF PRODUCTS: {{productCount}}</h2>
+    </div>
+  </v-sheet>
+
     <v-layout>
     <div @click="handleCanvasClick" id="konva-container"></div>
       <v-navigation-drawer
@@ -11,10 +24,10 @@
         <v-list density="compact" nav>
           <v-tooltip v-for="item in menuItems" :key="item.value" :label="item.title" position="right">
             <template v-slot:activator="{ props }">
-              <v-list-item v-bind="props" :prepend-icon="item.icon" :title="item.title" :value="item.value" @click="handleMenuItemClick(item)">
+              <v-list-item v-bind="props" :active="isItemActive(item.value)" :prepend-icon="item.icon" :title="item.title" :value="item.value" @click="handleMenuItemClick(item)" >
               </v-list-item>
             </template>
-            <span>{{item.value}}</span>
+            <span>{{item.title}}</span>
           </v-tooltip>
         </v-list>
       </v-navigation-drawer>
@@ -35,6 +48,8 @@ export default {
         { title: 'Machine', value: 'machine', icon: 'mdi-router-network' },
         { title: 'Connect', value: 'connect', icon: 'mdi-arrow-top-right' },
         { title: 'Play', value: 'play', icon: 'mdi-play-circle' },
+        { title: 'Increase Product', value: 'add', icon: 'mdi-plus-circle' },
+        { title: 'Decrease Product', value: 'minus', icon: 'mdi-minus-circle' },
         { title: 'Reload', value: 'reload', icon: 'mdi-reload' },
       ],
       stage: null,
@@ -43,12 +58,19 @@ export default {
       startShape: null,
       endShape: null,
       lastshapeclicked: null,
-      
+      productCount: null
     };
   },
   methods: {
+    isItemActive(value) {
+      // return value !== 'add' && value !== 'minus';
+      if (value === 'add' || value === 'minus') {
+        return false;
+      }
+      return null
+    },
     handleMenuItemClick(item) {
-      if (item.value === this.selectedShape) {
+      if (item.value === this.selectedShape && item.value != 'add' && item.value != 'minus') {
         this.selectedShape = null;
       }
       else{
@@ -58,6 +80,20 @@ export default {
       this.startShape = null;
       this.endShape = null;
       this.lastshapeclicked = null;
+      if (this.selectedShape === 'add') {
+        this.addProduct();
+      }
+      else if(this.selectedShape === 'minus'){
+        this.removeProduct();
+      }
+    },
+    addProduct(){
+      this.productCount++;
+    },
+    removeProduct(){
+      if (this.productCount > 0) {
+        this.productCount--;
+      }
     },
     handleCanvasClick(event) {
       const container = this.$el.querySelector('#konva-container');
@@ -225,3 +261,7 @@ export default {
   },
 };
 </script>
+
+
+<style scoped>
+</style>
