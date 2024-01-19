@@ -30,12 +30,12 @@ public class SimulationController {
 
     /** POST Request
      * Connect machine and queue
-     * @param from String like "M2" form, in request body
-     * @param to String like "Q3" form, in request body
+     * @param connection: Array of Strings like "M2" form, in request body
      */
     @PostMapping("/connect")
-    public void connectMAndQ(@RequestBody String from, @RequestBody String to) {
+    public void connectMAndQ(@RequestBody ConnectRequest connection) {
         SimulationService service = SimulationService.getInstance();
+        service.connect(connection.getSource(), connection.getDestination());
     }
 
     /**
