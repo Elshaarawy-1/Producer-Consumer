@@ -3,16 +3,20 @@ package com.csed.producerconsumer.Clients;
 import java.util.LinkedList;
 
 public class Queue {
-    private String id;
+    private int id;
     private LinkedList<Product> products;
 
-    public Queue(String id) {
+    public Queue(int id) {
         this.id = id;
         this.products = new LinkedList<>();
     }
 
-    public String getId() {
+    public int getId() {
         return id;
+    }
+
+    public void setProducts(LinkedList<Product> products) {
+        this.products = products;
     }
 
     public synchronized void enqueue(Product product) {
@@ -35,5 +39,8 @@ public class Queue {
     }
     public synchronized void printQueueState() {
         System.out.println("Queue " + id + " - Number of products: " + getCurrentNumberOfProducts());
+        for (Product product : this.products){
+            System.out.println(product.getColor());
+        }
     }
 }
