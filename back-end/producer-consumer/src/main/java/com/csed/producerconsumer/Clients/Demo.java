@@ -3,7 +3,7 @@ package com.csed.producerconsumer.Clients;
 public class Demo {
 
     public static void main(String[] args) {
-        SimulationService service = new SimulationService();
+        SimulationService service = SimulationService.getInstance();
         for (int i = 0; i < 3; i++) {
             service.addQueue();
         }

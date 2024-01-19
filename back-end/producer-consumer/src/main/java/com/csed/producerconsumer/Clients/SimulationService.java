@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
 // Memento Originator
 public class SimulationService {
     private HashMap<Integer,Queue> queues = new HashMap<>();
@@ -13,6 +12,18 @@ public class SimulationService {
     private boolean isSimulationRunning;
     int machineId = 1;
     int queueId=0;
+    private static SimulationService service;
+    private int processedProducts = 0;
+    private int totalProducts = 0;
+    private static ReplayCareTaker careTaker;
+    private SimulationService(){}
+    public static SimulationService getInstance() {
+        if (service == null) {
+            service = new SimulationService();
+            careTaker=new ReplayCareTaker(service);
+        }
+        return service;
+    }
 
     public void processInputProducts(int numberOfProducts){
         Queue q0 = queues.getOrDefault(0, null);
@@ -56,7 +67,10 @@ public class SimulationService {
                 machine.setOutputQueue(q0);
             }
         }
+        totalProducts=numberOfProducts;
+        careTaker.saveSnapshot();
     }
+
     public int addQueue(){
         queues.put(queueId,new Queue(queueId));
         return queueId++;
@@ -70,7 +84,7 @@ public class SimulationService {
         if (!isSimulationRunning) {
             // Initialize and start threads for machines
             for (Machine machine : machines.values()) {
-                machine.addObserver(new ReplayCareTaker(this));
+                machine.addObserver(careTaker);
                 Thread machineThread=new Thread(machine);
                 machineThread.start();
             }
@@ -86,7 +100,6 @@ public class SimulationService {
                 Thread machineThread=new Thread(machine);
                 machineThread.interrupt();
             }
-
             // Set the simulation state to stopped
             isSimulationRunning = false;
         }
@@ -160,5 +173,19 @@ public class SimulationService {
     }
     public void updateMachineById(int id, Machine M){
         machines.put(id,M);
+    }
+    public void productProcessed() {
+        synchronized (this) {
+            processedProducts++;
+
+            // Check if all products are processed
+            if (processedProducts == totalProducts) {
+                stopSimulation();
+            }
+        }
+    }
+    public void resetService(){
+        stopSimulation();
+        service=null;
     }
 }
