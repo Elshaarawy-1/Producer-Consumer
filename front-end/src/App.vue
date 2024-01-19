@@ -1,7 +1,9 @@
 <template>
   <v-card>
+
       <v-sheet v-if="productCount!=null"
     class="d-flex align-center justify-center flex-wrap text-center mx-auto px-4"
+    style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;"
     elevation="20"
     height="50"
     rounded
@@ -12,7 +14,6 @@
       <h2 class="text-h4 font-weight-black text-orange">NUMBER OF PRODUCTS: {{productCount}}</h2>
     </div>
   </v-sheet>
-
     <v-layout>
     <div @click="handleCanvasClick" id="konva-container"></div>
       <v-navigation-drawer
@@ -58,7 +59,7 @@ export default {
       startShape: null,
       endShape: null,
       lastshapeclicked: null,
-      productCount: null
+      productCount: 0
     };
   },
   methods: {
