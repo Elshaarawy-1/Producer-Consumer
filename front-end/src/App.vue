@@ -42,17 +42,22 @@ export default {
       selectedShape: null,
       startShape: null,
       endShape: null,
-
+      lastshapeclicked: null,
       
     };
   },
   methods: {
     handleMenuItemClick(item) {
-      this.selectedShape = item.value;
-
+      if (item.value === this.selectedShape) {
+        this.selectedShape = null;
+      }
+      else{
+        this.selectedShape = item.value;
+      }
       // Clear start and end shapes when a menu item is clicked
       this.startShape = null;
       this.endShape = null;
+      this.lastshapeclicked = null;
     },
     handleCanvasClick(event) {
       const container = this.$el.querySelector('#konva-container');
@@ -76,28 +81,35 @@ export default {
         y,
         radius: 25,
         fill: 'orange',
+        id: circleID, // will be used to identify the circle later 
         draggable: false,
+      });
+
+      circle.on('click', () => {
+        this.handleShapeClick(circle);
       });
 
       this.layer.add(circle);
       const text = new Konva.Text({
-          x: x , // Adjust the x-coordinate based on your design
-          y: y, // Adjust the y-coordinate based on your design
-          text: 'Q' + circleID,
-          fontSize: 12,
-          fill: 'black',
-          width: 40, // Set the width of the text box
-          align: 'center',
+        x,
+        y, 
+        text: 'Q' + circleID,
+        fontSize: 12,
+        fill: 'black',
+        width: 40, 
+        align: 'center',
       });
 
-      // Center the text inside the circle
       text.offsetX(text.width() / 2);
       text.offsetY(text.height() / 2);
+      text.on('click', () => {
+        this.handleShapeClick(circle);
+      });
 
-      // Add the text to the same layer
       this.layer.add(text);
       this.stage.draw();
     },
+
     drawSquare(x, y) {
       //request backend and get the machineID and put it below text
       const squareID = 1; // replace it with the return data from backend
@@ -106,31 +118,44 @@ export default {
         y,
         width: 50,
         height: 50,
+        id: squareID, // will be used to identify the square later 
+
         fill: 'grey',
         draggable: false,
       });
 
-      this.layer.add(square);
-      const text = new Konva.Text({
-          x: x+25 , // Adjust the x-coordinate based on your design
-          y: y+25, // Adjust the y-coordinate based on your design
-          text: 'M' + squareID,
-          fontSize: 12,
-          fill: 'white',
-          width: 40, // Set the width of the text box
-          align: 'center',
+      square.on('click', () => {
+        this.handleShapeClick(square);
       });
 
-      // Center the text inside the circle
+      this.layer.add(square);
+      const text = new Konva.Text({
+        x: x + 25, 
+        y: y + 25, 
+        text: 'M' + squareID,
+        fontSize: 12,
+        fill: 'white',
+        width: 40, 
+        align: 'center',
+      });
+
       text.offsetX(text.width() / 2);
       text.offsetY(text.height() / 2);
+      text.on('click', () => {
+        this.handleShapeClick(square);
+      });
 
-      // Add the text to the same layer
       this.layer.add(text);
       this.stage.draw();
     },
+
+    handleShapeClick(shape) {
+      console.log('Shape clicked');
+      this.lastshapeclicked = shape;
+    },
     handleConnectClick(clickX, clickY) {
-      const clickedShape = this.findShapeAtPosition(clickX, clickY);
+      console.log(this.lastshapeclicked);
+      const clickedShape = this.lastshapeclicked;
       if (clickedShape) {
         if (!this.startShape) {
           this.startShape = clickedShape;
@@ -139,28 +164,43 @@ export default {
           this.connectShapes();
           this.startShape = null;
           this.endShape = null;
-          this.selectedShape = null;
+          this.lastshapeclicked = null;
         }
       }
     },
-    findShapeAtPosition(x, y) {
-      return this.layer.getChildren(node => node.getClassName() === 'Circle' || node.getClassName() === 'Rect').find(shape => {
-        const shapeX = shape.x();
-        const shapeY = shape.y();
-        const shapeWidth = shape.getClassName() === 'Circle' ? shape.radius() : shape.width();
-        const shapeHeight = shape.getClassName() === 'Circle' ? shape.radius() : shape.height();
-
-        return x >= shapeX && x <= shapeX + shapeWidth && y >= shapeY && y <= shapeY + shapeHeight;
-      });
-    },
     connectShapes() {
-      if (this.startShape && this.endShape) {
+      if (this.startShape && this.endShape && this.startShape !== this.endShape) {
+        const dx = this.endShape.x() - this.startShape.x();
+        const dy = this.endShape.y() - this.startShape.y();
+        let angle = Math.atan2(-dy, dx);
+
+        const radius = 48;
+        let from = {
+          x: this.startShape.x(),
+          y: this.startShape.y(),
+        };
+
+        let to = {
+          x: this.endShape.x(),
+          y: this.endShape.y(),
+        };
+
+        if (this.startShape.getClassName() === 'Rect') {
+          from.x += 25;
+          from.y += 25;
+        }
+
+        if (this.endShape.getClassName() === 'Rect') {
+          to.x += 25;
+          to.y += 25;
+        }
+
         const arrow = new Konva.Arrow({
           points: [
-            this.startShape.x() + this.startShape.width() / 2,
-            this.startShape.y() + this.startShape.height() / 2,
-            this.endShape.x() + this.endShape.width() / 2,
-            this.endShape.y() + this.endShape.height() / 2,
+            from.x + -radius * Math.cos(angle + Math.PI),
+            from.y + radius * Math.sin(angle + Math.PI),
+            to.x + -radius * Math.cos(angle),
+            to.y + radius * Math.sin(angle),
           ],
           fill: 'black',
           stroke: 'black',
@@ -170,7 +210,8 @@ export default {
         this.layer.add(arrow);
         this.stage.draw();
       }
-    },
+  },
+
   },
   mounted() {
     this.stage = new Konva.Stage({
