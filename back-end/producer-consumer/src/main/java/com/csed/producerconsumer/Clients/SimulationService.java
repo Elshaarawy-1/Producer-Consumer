@@ -1,10 +1,12 @@
 package com.csed.producerconsumer.Clients;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 // Memento Originator
+@Service
 public class SimulationService {
     private HashMap<Integer,Queue> queues = new HashMap<>();
 
@@ -16,11 +18,16 @@ public class SimulationService {
     private int processedProducts = 0;
     private int totalProducts = 0;
     private static ReplayCareTaker careTaker;
-    private SimulationService(){}
+
+    private final WebSocketController webSocketController;
+    @Autowired
+    public SimulationService(WebSocketController webSocketController){
+        this.webSocketController = webSocketController;
+        careTaker = new ReplayCareTaker(this, webSocketController);
+    }
     public static SimulationService getInstance() {
         if (service == null) {
-            service = new SimulationService();
-            careTaker=new ReplayCareTaker(service);
+            throw new IllegalStateException("Service not initialized through Spring context.");
         }
         return service;
     }
@@ -186,6 +193,5 @@ public class SimulationService {
     }
     public void resetService(){
         stopSimulation();
-        service=null;
     }
 }

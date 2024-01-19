@@ -1,14 +1,22 @@
 package com.csed.producerconsumer.Clients;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class ReplayCareTaker implements MachineObserver{
     private final List<SimulationMemento> mementos = new ArrayList<>();
     private SimulationService service;
+    private final WebSocketController webSocketController;
 
-    ReplayCareTaker(SimulationService service){
+    @Autowired
+    ReplayCareTaker(SimulationService service, WebSocketController webSocketController){
         this.service=service;
+        this.webSocketController=webSocketController;
     }
     @Override
     public void update(Machine machine) {
@@ -20,6 +28,8 @@ public class ReplayCareTaker implements MachineObserver{
         synchronized (mementos) {
             saveSnapshot();
         }
+        SimulationMemento memento = service.takeSnapshot();
+        webSocketController.updateSimulation(memento);
     }
     public void saveSnapshot()
     {
