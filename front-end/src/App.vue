@@ -59,7 +59,10 @@ export default {
       startShape: null,
       endShape: null,
       lastshapeclicked: null,
-      productCount: 0
+      productCount: 0,
+      circles:[],
+      squares:[],
+
     };
   },
   methods: {
@@ -129,14 +132,13 @@ export default {
       this.layer.add(circle);
       const text = new Konva.Text({
         x,
-        y, 
+        y,
         text: 'Q' + circleID,
         fontSize: 12,
         fill: 'black',
-        width: 40, 
+        width: 40,
         align: 'center',
       });
-
       text.offsetX(text.width() / 2);
       text.offsetY(text.height() / 2);
       text.on('click', () => {
@@ -145,6 +147,7 @@ export default {
 
       this.layer.add(text);
       this.stage.draw();
+      this.circles.push({ id: circleID, circle, text });
     },
 
     drawSquare(x, y) {
@@ -184,6 +187,7 @@ export default {
 
       this.layer.add(text);
       this.stage.draw();
+      this.squares.push({ id: squareID, square, text });
     },
 
     handleShapeClick(shape) {
@@ -191,6 +195,8 @@ export default {
       this.lastshapeclicked = shape;
     },
     handleConnectClick(clickX, clickY) {
+      // this.detect_queue(0); ///for testing the detect functions
+      // this.detect_machine(1);
       console.log(this.lastshapeclicked);
       const clickedShape = this.lastshapeclicked;
       if (clickedShape) {
@@ -248,6 +254,33 @@ export default {
         this.stage.draw();
       }
   },
+  detect_queue(id) {
+    // Find the circle with the given ID from backend
+    const targetCircle = this.circles.find(circleObj => circleObj.id === id);
+
+    if (targetCircle) {
+      console.log("Required circle:", targetCircle.circle);
+      targetCircle.text.text([
+      'Q'+id,  // Replace 'New Line 1' with the desired text for line 1
+      '2',  // Replace it with the number of products in queue from backend
+       ].join('\n'));
+
+    } else {
+      console.log("Circle with ID", id, "not found.");
+    }
+  },
+  detect_machine(id) {
+    // Find the circle with the specified ID from backend
+    const targetmachine = this.squares.find(squareObj => squareObj.id === id);
+    if (targetmachine) {
+      console.log("Required machine:", targetmachine.square);
+      targetmachine.square.fill('blue') //example of changing color
+      this.stage.draw();
+    } else {
+      console.log("machine with ID", id, "not found.");
+    }
+  },
+
 
   },
   mounted() {
