@@ -39,6 +39,15 @@
 <script>
 import Konva from 'konva';
 import axios from 'axios';
+// import VueNativeSock from "vue-native-websocket-vue3";
+
+// Add this to your Vue component
+// Vue.use(VueNativeSock, 'ws://localhost:5000/ws', {
+//   reconnection: true, // (Boolean) whether to reconnect automatically (false)
+//   reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
+//   reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
+// });
+
 
 export default {
   data() {
@@ -52,7 +61,7 @@ export default {
         { title: 'Play', value: 'play', icon: 'mdi-play-circle' },
         { title: 'Increase Product', value: 'add', icon: 'mdi-plus-circle' },
         { title: 'Decrease Product', value: 'minus', icon: 'mdi-minus-circle' },
-        { title: 'Reload', value: 'reload', icon: 'mdi-reload' },
+        { title: 'Replay', value: 'replay', icon: 'mdi-reload' },
         { title: 'Clear', value: 'clear', icon: 'mdi-layers-off' },
       ],
       stage: null,
@@ -68,9 +77,24 @@ export default {
     };
   },
   methods: {
+        handleWebSocketMessage(event) {
+      try {
+        const data = JSON.parse(event.data);
+
+        // Handle WebSocket message based on the received data
+        if (data.type === 'colorChange') {
+          this.handleColorChange(data.shapeId, data.newColor);
+        } else if (data.type === 'otherMessageType') {
+          // Handle other types of messages
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    },
+
     isItemActive(value) {
       // return value !== 'add' && value !== 'minus';
-      if (value === 'add' || value === 'minus' || value === 'play' || value === 'reload' || value === 'clear') {
+      if (value === 'add' || value === 'minus' || value === 'play' || value === 'replay' || value === 'clear') {
         return false;
       }
       return null
@@ -95,15 +119,15 @@ export default {
       else if(this.selectedShape === 'play'){
         this.play();
       }
-      else if(this.selectedShape === 'reload'){
-        this.reload();
+      else if(this.selectedShape === 'replay'){
+        this.replay();
       }
       else if(this.selectedShape === 'clear'){
         this.clear();
       }
     },
     play() {
-      axios.post('http://localhost:5000/start', {
+      axios.post('http://localhost:8081/start', {
         numberOfProducts: this.productCount,
       }, {
         headers: {
@@ -117,8 +141,8 @@ export default {
           console.error(error);
         });
     },
-    reload(){
-      axios.post('http://localhost:5000/reload', {
+    replay(){
+      axios.post('http://localhost:8081/replay', {
       })
         .then((response) => {
           console.log(response);
@@ -128,16 +152,21 @@ export default {
         });
     },
     clear(){
-      axios.post('http://localhost:5000/clear', {
+      axios.get('http://localhost:8081/clear', {
       })
         .then((response) => {
           console.log(response);
-          if(response.data == "success"){
-            this.stage.destroyChildren();
-            this.stage.draw();
-            this.circles = [];
-            this.squares = [];
-          }
+          this.stage.destroy();        
+          this.stage = new Konva.Stage({
+            container: 'konva-container',
+            width: window.innerWidth,
+            height: window.innerHeight,
+          });
+
+          this.layer = new Konva.Layer();
+          this.stage.add(this.layer);
+          this.circles = [];
+          this.squares = [];
         })
         .catch((error) => {
           console.error(error);
@@ -168,11 +197,11 @@ export default {
     async drawCircle(x, y) {
       try {
         // Make an asynchronous request to the backend
-        // const response = await axios.get('http://localhost:5000/createqueue');
+        const response = await axios.get('http://localhost:8081/add/queue');
 
         // Extract the ID from the response data
-        // const circleID = response.data;
-        const circleID = 1;
+        const circleID = response.data;
+        // const circleID = 1;
         console.log(circleID);
 
         // Create the Konva circle
@@ -227,11 +256,11 @@ export default {
     async drawSquare(x, y) {
       try {
         // Make an asynchronous request to the backend
-        // const response = await axios.get('http://localhost:5000/createmachine');
+        const response = await axios.get('http://localhost:8081/add/machine');
 
         // Extract the ID from the response data
-        // const squareID = response.data;
-        const squareID = 1;
+        const squareID = response.data;
+        // const squareID = 1;
         console.log(squareID);
 
         // Create the Konva square
@@ -305,29 +334,28 @@ export default {
         }
       }
     },
-    drawArrow() {
-      const dx = this.endShape.x() - this.startShape.x();
-      const dy = this.endShape.y() - this.startShape.y();
+    drawArrow(startShape, endShape) {
+      console.log(startShape, endShape);
+      const dx = endShape.x() - startShape.x();
+      const dy = endShape.y() - startShape.y();
       let angle = Math.atan2(-dy, dx);
-      // console.log(this.startShape.id(), this.endShape.id());
-
       const radius = 48;
       let from = {
-        x: this.startShape.x(),
-        y: this.startShape.y(),
+        x: startShape.x(),
+        y: startShape.y(),
       };
 
       let to = {
-        x: this.endShape.x(),
-        y: this.endShape.y(),
+        x: endShape.x(),
+        y: endShape.y(),
       };
 
-      if (this.startShape.getClassName() === 'Rect') {
+      if (startShape.getClassName() === 'Rect') {
         from.x += 25;
         from.y += 25;
       }
 
-      if (this.endShape.getClassName() === 'Rect') {
+      if (endShape.getClassName() === 'Rect') {
         to.x += 25;
         to.y += 25;
       }
@@ -347,28 +375,31 @@ export default {
       this.layer.add(arrow);
       this.stage.draw();
     },
-    connectShapes() {
-      if (this.startShape && this.endShape && this.startShape !== this.endShape) {
-        const startShapeId = this.startShape.id();
-        const endShapeId = this.endShape.id();
-        this.drawArrow();
-        axios.post('http://localhost:5000/connect', {
-            source: startShapeId,
-            destination: endShapeId,
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then((response) => {
-            console.log(response);
-            this.drawArrow();
-        })
-        .catch((error) => {
-            console.error(error);
-        });
-      }
-  },
+connectShapes() {
+  if (this.startShape && this.endShape && this.startShape !== this.endShape) {
+    const startShapeId = this.startShape.id();
+    const endShapeId = this.endShape.id();
+    const startShape = this.startShape;
+    const endShape = this.endShape;
+    axios.post('http://localhost:8081/connect', {
+      source: startShapeId,
+      destination: endShapeId,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    .then((response) => {
+      console.log(response);
+      console.log(startShape, endShape)
+      this.drawArrow(startShape, endShape);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+    console.log(this.startShape, this.endShape);
+  }
+},
   detect_queue(id) {
     // Find the circle with the given ID from backend
     const targetCircle = this.circles.find(circleObj => circleObj.id === id);
@@ -407,6 +438,8 @@ export default {
 
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
+    this.$socket.addEventListener('message', this.handleWebSocketMessage);
+
   },
 };
 </script>

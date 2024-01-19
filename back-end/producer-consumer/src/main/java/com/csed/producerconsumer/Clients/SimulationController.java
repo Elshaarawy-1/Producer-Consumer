@@ -4,14 +4,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*" )
-@RequestMapping("/api")
+@RequestMapping("/")
 public class SimulationController {
 
     /** POST Request
      * End point to confirm Add Queue
      * @return the ID of the Queue added
      */
-    @PostMapping("/add/queue")
+    @GetMapping("/add/queue")
     public int addQueue(){
         SimulationService service = SimulationService.getInstance();
         return service.addQueue();
@@ -21,7 +21,7 @@ public class SimulationController {
      * End point to confirm add Machine
      * @return the ID of the Machine added
      */
-    @PostMapping("/add/machine")
+    @GetMapping("/add/machine")
     public int addMachine(){
         SimulationService service = SimulationService.getInstance();
         return service.addMachine();
@@ -49,12 +49,12 @@ public class SimulationController {
         service.processInputProducts(numberOfProducts);
         service.startSimulation();
     }
-    @PostMapping("/replay")
+    @GetMapping("/replay")
     public void replaySimulation(){
         SimulationService service = SimulationService.getInstance();
         // TODO: Replay functionality
     }
-    @PostMapping("/clear")
+    @GetMapping("/clear")
     public void clearSimulation(){
         SimulationService service = SimulationService.getInstance();
         service.resetService();

@@ -1,5 +1,6 @@
 package com.csed.producerconsumer.Clients;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,10 @@ public class SimulationService {
     public SimulationService(WebSocketController webSocketController){
         this.webSocketController = webSocketController;
         careTaker = new ReplayCareTaker(this, webSocketController);
+    }
+    @PostConstruct
+    public void initialize() {
+        service = this;
     }
     public static SimulationService getInstance() {
         if (service == null) {
@@ -191,7 +196,19 @@ public class SimulationService {
             }
         }
     }
-    public void resetService(){
+    public void resetService() {
         stopSimulation();
+
+        // Reset all fields to their default state
+        queues.clear();
+        machines.clear();
+        isSimulationRunning = false;
+        machineId = 1;
+        queueId = 0;
+        processedProducts = 0;
+        totalProducts = 0;
+
+        // Create a new instance of ReplayCareTaker with the new WebSocketController
+        careTaker = new ReplayCareTaker(this, webSocketController);
     }
 }
