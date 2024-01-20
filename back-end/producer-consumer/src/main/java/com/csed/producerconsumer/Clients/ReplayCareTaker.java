@@ -29,6 +29,7 @@ public class ReplayCareTaker implements MachineObserver{
             saveSnapshot();
         }
         SimulationMemento memento = service.takeSnapshot();
+        System.out.println("Calling updateSimulation");
         webSocketController.updateSimulation(memento);
     }
     public void saveSnapshot()

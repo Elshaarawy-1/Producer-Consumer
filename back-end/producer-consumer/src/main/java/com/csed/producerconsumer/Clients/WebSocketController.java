@@ -18,6 +18,7 @@ public class WebSocketController {
 
     @MessageMapping("/update")
     public void updateSimulation(SimulationMemento memento) {
+        System.out.println("Inside updateSimulation WS");
         messagingTemplate.convertAndSend("/topic/ws/simulation", memento);
     }
 }
