@@ -10,7 +10,9 @@
     "@mdi/font": "5.9.55",
     "axios": "^1.6.5",
     "konva": "^9.3.0",
+    "net": "^1.0.2",
     "roboto-fontface": "*",
+    "stompjs": "^2.3.3",
     "vue": "^3.2.13",
     "vue-native-websocket": "^2.0.15",
     "vue-native-websocket-vue3": "^3.1.7",
@@ -18,6 +20,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
+    "@types/stompjs": "^2.3.9",
     "@vue/cli-service": "~5.0.0",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "webpack-plugin-vuetify": "^2.0.0-alpha.0"

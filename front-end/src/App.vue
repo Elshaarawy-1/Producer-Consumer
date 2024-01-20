@@ -39,19 +39,13 @@
 <script>
 import Konva from 'konva';
 import axios from 'axios';
-// import VueNativeSock from "vue-native-websocket-vue3";
-
-// Add this to your Vue component
-// Vue.use(VueNativeSock, 'ws://localhost:5000/ws', {
-//   reconnection: true, // (Boolean) whether to reconnect automatically (false)
-//   reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-//   reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
-// });
-
+import Stomp from 'stompjs';
 
 export default {
   data() {
     return {
+      stompClient: null,
+
       drawer: true,
       rail: true,
       menuItems: [
@@ -127,9 +121,7 @@ export default {
       }
     },
     play() {
-      axios.post('http://localhost:8081/start', {
-        numberOfProducts: this.productCount,
-      }, {
+      axios.post('http://localhost:8081/start', this.productCount, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -437,8 +429,37 @@ connectShapes() {
 
     this.layer = new Konva.Layer();
     this.stage.add(this.layer);
-    this.$socket.addEventListener('message', this.handleWebSocketMessage);
-
+    this.stompClient = Stomp.over(new WebSocket('ws://localhost:8081/ws'));
+ 
+    this.stompClient.connect({}, frame => {
+      console.log('Connected to WebSocket:', frame);
+ 
+      // Subscribe to "/app/simulation" destination
+      this.stompClient.subscribe('/topic/ws/simulation', message => {
+        // Handle incoming messages
+        const simulationUpdate = JSON.parse(message.body);
+        const UpdatedQueue = simulationUpdate['queueMementos'];
+        const UpdatedMachine = simulationUpdate['machineMementos'];
+        UpdatedQueue.forEach(element => {
+          this.update_queue(element['id'],element['numberOfProducts']);
+          console.log(element['id'],element['numberOfProducts']);
+        });
+        UpdatedMachine.forEach(element => {
+          this.update_machine(element['id'],element['color']);
+          console.log(element['id'],element['color']);
+        });
+        // console.log('Received simulation update:', simulationUpdate);
+ 
+        // Update the component state with the new simulation data
+        // this.simulationUpdates.push(simulationUpdate);
+      });
+    });
+  },
+  beforeUnmount() {
+    // Disconnect from WebSocket when the component is destroyed
+    if (this.stompClient) {
+      this.stompClient.disconnect();
+    }
   },
 };
 </script>

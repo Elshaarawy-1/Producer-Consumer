@@ -8,7 +8,7 @@ public class Machine implements Runnable {
     private int id;
     private Queue inputQueue;
     private Queue outputQueue;
-    private String defaultColor = "#B96E37";
+    private String defaultColor = "#864AF9";
     private String currentColor;
 
     private boolean isReady = true;
@@ -19,7 +19,7 @@ public class Machine implements Runnable {
         this.id = id;
         this.currentColor=this.defaultColor;
         // Random processing time between 1500 and 4500 milliseconds
-        this.machineServiceTime=new Random().nextInt(3000) + 1500;
+        this.machineServiceTime=new Random().nextInt(3000) + 5500;
     }
 
     public void setInputQueue(Queue inputQueue) {
