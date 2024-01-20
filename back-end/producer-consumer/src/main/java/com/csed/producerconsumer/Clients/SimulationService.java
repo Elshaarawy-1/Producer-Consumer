@@ -53,7 +53,10 @@ public class SimulationService {
 
             // Convert RGB to hexadecimal
             String hexColor = String.format("#%02X%02X%02X", r, g, b);
-
+            // if product color is the default color, skip
+            if (hexColor.equals("#864AF9")) {
+                continue;
+            }
             // Add the color to the set (ensuring uniqueness)
             colorSet.add(hexColor);
         }
