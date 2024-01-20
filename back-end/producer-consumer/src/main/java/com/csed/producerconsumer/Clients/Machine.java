@@ -4,12 +4,13 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class Machine implements Runnable {
     private int id;
     private List<Queue> inputQueues;
     private List<Queue> outputQueues;
-    private String defaultColor = "#864AF9";
+    private String defaultColor = "#808080";
     private String currentColor;
 
     private boolean isReady = true;
@@ -52,49 +53,60 @@ public class Machine implements Runnable {
                         return; // Exit the thread if interrupted
                     }
                 }
-            }
+                // Get a list of non-empty input queues
+                List<Queue> nonEmptyInputQueues = inputQueues.stream()
+                        .filter(queue -> !(queue.getCurrentNumberOfProducts()==0))
+                        .toList();
 
-            // Consume a product from the input queue
-            Product product = null;
-            try {
-                int randomInputQueueIndex = new Random().nextInt(inputQueues.size());
-                product = inputQueues.get(randomInputQueueIndex).dequeue();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            // Change machine color to product color
-            this.currentColor = product.getColor();
-            synchronized (this) {
+                if (nonEmptyInputQueues.isEmpty()) {
+                    // No non-empty input queues available, wait for a while and then continue the loop
+                    try {
+                        Thread.sleep(100);
+                        continue;
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                // Consume a product from a randomly selected non-empty input queue
+                Product product = null;
+                try {
+                    int randomInputQueueIndex = new Random().nextInt(nonEmptyInputQueues.size());
+                    product = nonEmptyInputQueues.get(randomInputQueueIndex).dequeue();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                // Change machine color to product color
+                this.currentColor = product.getColor();
                 notifyObservers();
-            }
-            //printMachineState();
 
-            // Simulate processing time
-            try {
-                Thread.sleep(machineServiceTime);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+                //printMachineState();
 
-            // Produce the finished product by adding it to the output queue
-            int randomOutputQueueIndex = new Random().nextInt(outputQueues.size());
-            outputQueues.get(randomOutputQueueIndex).enqueue(product);
+                // Simulate processing time
+                try {
+                    Thread.sleep(machineServiceTime);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
-            // Reset machine color to default
-            this.currentColor = defaultColor;
+                // Produce the finished product by adding it to the output queue
+                int randomOutputQueueIndex = new Random().nextInt(outputQueues.size());
+                outputQueues.get(randomOutputQueueIndex).enqueue(product);
 
-            // Machine is ready for the next product
-            isReady = true;
+                // Reset machine color to default
+                this.currentColor = defaultColor;
 
-            synchronized (this) {
+                // Machine is ready for the next product
+                isReady = true;
+
                 notifyObservers();
                 notify(); // Notify waiting threads that the machine is ready
-            }
 
-            // Notify the UI or other components about the simulation state
-            //printMachineState();
-            // You may use observers or other mechanisms for this purpose
-            // notifySimulationUpdate()
+                // Notify the UI or other components about the simulation state
+                //printMachineState();
+                // You may use observers or other mechanisms for this purpose
+                // notifySimulationUpdate()
+            }
         }
     }
     // Method to add observers
