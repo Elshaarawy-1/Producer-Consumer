@@ -318,8 +318,6 @@ export default {
       this.lastshapeclicked = shape;
     },
     handleConnectClick(clickX, clickY) {
-      // this.detect_queue(0); ///for testing the detect functions
-      // this.detect_machine(1);
       console.log(this.lastshapeclicked);
       const clickedShape = this.lastshapeclicked;
       if (clickedShape) {
@@ -400,31 +398,32 @@ connectShapes() {
     console.log(this.startShape, this.endShape);
   }
 },
-  detect_queue(id) {
-    // Find the circle with the given ID from backend
+  update_queue(id , queueproducts) { // usage->>> update_queue(3,5)
     const targetCircle = this.circles.find(circleObj => circleObj.id === id);
 
     if (targetCircle) {
       console.log("Required circle:", targetCircle.circle);
       targetCircle.text.text([
-      'Q'+id,  // Replace 'New Line 1' with the desired text for line 1
-      '2',  // Replace it with the number of products in queue from backend
+      'Q'+id,  
+      queueproducts,  
        ].join('\n'));
 
     } else {
       console.log("Circle with ID", id, "not found.");
     }
+
+    return targetCircle.circle;
   },
-  detect_machine(id) {
-    // Find the circle with the specified ID from backend
+  update_machine(id , color) { // usage->>> update_machine(2,'red')
     const targetmachine = this.squares.find(squareObj => squareObj.id === id);
     if (targetmachine) {
       console.log("Required machine:", targetmachine.square);
-      targetmachine.square.fill('blue') //example of changing color
-      this.stage.draw();
+      targetmachine.square.fill(color) 
     } else {
       console.log("machine with ID", id, "not found.");
     }
+
+    return targetmachine.square;
   },
 
 
