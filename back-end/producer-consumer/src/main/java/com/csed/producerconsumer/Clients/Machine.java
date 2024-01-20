@@ -53,6 +53,8 @@ public class Machine implements Runnable {
             }
             // Change machine color to product color
             this.currentColor = product.getColor();
+            notifyObservers();
+            //printMachineState();
 
             // Simulate processing time
             try {
@@ -60,8 +62,6 @@ public class Machine implements Runnable {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            notifyObservers();
-            //printMachineState();
 
             // Produce the finished product by adding it to the output queue
             outputQueue.enqueue(product);
