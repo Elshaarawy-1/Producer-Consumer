@@ -398,7 +398,7 @@ export default {
       if (
         this.startShape &&
         this.endShape &&
-        this.startShape.id[0] !== this.endShape.id[0]
+        this.startShape.id()[0] !== this.endShape.id()[0]
       ) {
         const startShapeId = this.startShape.id();
         const endShapeId = this.endShape.id();
