@@ -53,7 +53,9 @@ public class Machine implements Runnable {
             }
             // Change machine color to product color
             this.currentColor = product.getColor();
-            notifyObservers();
+            synchronized (this) {
+                notifyObservers();
+            }
             //printMachineState();
 
             // Simulate processing time
@@ -72,11 +74,11 @@ public class Machine implements Runnable {
             isReady = true;
 
             synchronized (this) {
+                notifyObservers();
                 notify(); // Notify waiting threads that the machine is ready
             }
 
             // Notify the UI or other components about the simulation state
-            notifyObservers();
             //printMachineState();
             // You may use observers or other mechanisms for this purpose
             // notifySimulationUpdate()
