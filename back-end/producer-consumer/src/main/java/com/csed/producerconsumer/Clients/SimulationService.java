@@ -72,14 +72,31 @@ public class SimulationService {
         for (Map.Entry<Integer, Machine> machineEntry : machines.entrySet()) {
             Machine machine = machineEntry.getValue();
 
-            // Check if the machine is connected to the oldQ0
-            if (machine.getInputQueue().getId() == 0) {
-                machine.setInputQueue(q0);
+            List<Queue> in = machine.getInputQueues();
+            List<Queue> out = machine.getOutputQueues();
+            List<Queue> new_input=new ArrayList<>();
+            List<Queue> new_output=new ArrayList<>();
+            for (Queue q : in ){
+                if (q.getId()==0){
+                    new_input.add(q0);
+                }
+                else
+                {
+                    new_input.add(q);
+                }
             }
-
-            if (machine.getOutputQueue().getId() == 0) {
-                machine.setOutputQueue(q0);
+            for (Queue q : out ){
+                if (q.getId()==0){
+                    new_output.add(q0);
+                }
+                else
+                {
+                    new_output.add(q);
+                }
             }
+            machine.setInputQueues(new_input);
+            machine.setOutputQueues(new_output);
+            machines.put(machine.getId(),machine);
         }
         totalProducts=numberOfProducts;
         careTaker.saveSnapshot();
@@ -139,7 +156,7 @@ public class SimulationService {
             return;
         }
 
-        machine.setOutputQueue(outputQueue);
+        machine.addOutputQueue(outputQueue);
         machines.put(machineId,machine);
     }
 
@@ -153,7 +170,7 @@ public class SimulationService {
             return;
         }
 
-        machine.setInputQueue(inputQueue);
+        machine.addInputQueue(inputQueue);
         machines.put(machineId,machine);
     }
     public SimulationMemento takeSnapshot() {

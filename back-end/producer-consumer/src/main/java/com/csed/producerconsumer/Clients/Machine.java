@@ -1,13 +1,14 @@
 package com.csed.producerconsumer.Clients;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class Machine implements Runnable {
     private int id;
-    private Queue inputQueue;
-    private Queue outputQueue;
+    private List<Queue> inputQueues;
+    private List<Queue> outputQueues;
     private String defaultColor = "#864AF9";
     private String currentColor;
 
@@ -18,16 +19,25 @@ public class Machine implements Runnable {
     public Machine(int id) {
         this.id = id;
         this.currentColor=this.defaultColor;
-        // Random processing time between 1500 and 4500 milliseconds
+        this.inputQueues = new ArrayList<>();
+        this.outputQueues = new ArrayList<>();
+        // Random processing time between 3500 and 8500 milliseconds
         this.machineServiceTime=new Random().nextInt(3000) + 5500;
     }
 
-    public void setInputQueue(Queue inputQueue) {
-        this.inputQueue = inputQueue;
+    public void setInputQueues(List<Queue> inputQueues) {
+        this.inputQueues = inputQueues;
     }
 
-    public void setOutputQueue(Queue outputQueue) {
-        this.outputQueue = outputQueue;
+    public void setOutputQueues(List<Queue> outputQueues) {
+        this.outputQueues = outputQueues;
+    }
+    public void addInputQueue(Queue inputQueue) {
+        this.inputQueues.add(inputQueue);
+    }
+
+    public void addOutputQueue(Queue outputQueue) {
+        this.outputQueues.add(outputQueue);
     }
 
     @Override
@@ -47,7 +57,8 @@ public class Machine implements Runnable {
             // Consume a product from the input queue
             Product product = null;
             try {
-                product = inputQueue.dequeue();
+                int randomInputQueueIndex = new Random().nextInt(inputQueues.size());
+                product = inputQueues.get(randomInputQueueIndex).dequeue();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -66,7 +77,9 @@ public class Machine implements Runnable {
             }
 
             // Produce the finished product by adding it to the output queue
-            outputQueue.enqueue(product);
+            int randomOutputQueueIndex = new Random().nextInt(outputQueues.size());
+            outputQueues.get(randomOutputQueueIndex).enqueue(product);
+
             // Reset machine color to default
             this.currentColor = defaultColor;
 
@@ -94,22 +107,13 @@ public class Machine implements Runnable {
             observer.update(this);
         }
     }
-    private void printMachineState() {
-        System.out.println(Thread.currentThread());
-        System.out.println("Machine " + id + " color: " + currentColor);
-        System.out.println("Machine " + id + " - Input Queue State:");
-        inputQueue.printQueueState();
-        System.out.println("Machine " + id + " - Output Queue State:");
-        outputQueue.printQueueState();
-        System.out.println("============================");
+
+    public List<Queue> getInputQueues() {
+        return inputQueues;
     }
 
-    public Queue getInputQueue() {
-        return inputQueue;
-    }
-
-    public Queue getOutputQueue() {
-        return outputQueue;
+    public List<Queue> getOutputQueues() {
+        return outputQueues;
     }
 
     public int getId() {

@@ -19,10 +19,13 @@ public class ReplayCareTaker implements MachineObserver{
     }
     @Override
     public void update(Machine machine) {
-        Queue inputQ=machine.getInputQueue();
-        Queue outputQ=machine.getOutputQueue();
-        service.updateQueueById(inputQ.getId(), inputQ);
-        service.updateQueueById(outputQ.getId(), outputQ);
+        List<Queue> inputQs=machine.getInputQueues();
+        List<Queue> outputQs=machine.getOutputQueues();
+        for (Queue inputQ : inputQs)
+            service.updateQueueById(inputQ.getId(), inputQ);
+        for (Queue outputQ : outputQs)
+            service.updateQueueById(outputQ.getId(), outputQ);
+
         service.updateMachineById(machine.getId(),machine);
         saveSnapshot();
         SimulationMemento memento = service.takeSnapshot();

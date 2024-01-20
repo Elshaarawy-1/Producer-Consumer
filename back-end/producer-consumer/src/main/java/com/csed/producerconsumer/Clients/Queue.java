@@ -37,10 +37,4 @@ public class Queue {
     public synchronized int getCurrentNumberOfProducts() {
         return products.size();
     }
-    public synchronized void printQueueState() {
-        System.out.println("Queue " + id + " - Number of products: " + getCurrentNumberOfProducts());
-        for (Product product : this.products){
-            System.out.println(product.getColor());
-        }
-    }
 }
