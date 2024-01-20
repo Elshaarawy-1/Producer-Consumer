@@ -263,7 +263,9 @@ export default {
           width: 50,
           height: 50,
           id: 'M'+squareID, // will be used to identify the square later 
-          fill: '#864AF9',
+          fill: '#808080',
+          stroke: 'orange',
+          strokeWidth: 6,
           draggable: false,
         });
 
@@ -281,7 +283,7 @@ export default {
           y: y + 25,
           text: 'M' + squareID,
           fontSize: 14,
-          fill: 'white',
+          fill: 'black',
           fontStyle: 'bold',
           width: 40,
           align: 'center',
@@ -413,6 +415,8 @@ connectShapes() {
     if (targetmachine) {
       console.log("Required machine:", targetmachine.square);
       targetmachine.square.fill(color) 
+      if (color!='#808080')
+        targetmachine.square.stroke('black')
     } else {
       console.log("machine with ID", id, "not found.");
     }
