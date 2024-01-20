@@ -18,6 +18,6 @@ public class WebSocketController {
 
     @MessageMapping("/update")
     public void updateSimulation(SimulationMemento memento) {
-        messagingTemplate.convertAndSend("/topic/simulation", memento);
+        messagingTemplate.convertAndSend("/topic/ws/simulation", memento);
     }
 }
