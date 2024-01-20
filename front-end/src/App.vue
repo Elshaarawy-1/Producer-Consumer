@@ -417,6 +417,8 @@ connectShapes() {
       targetmachine.square.fill(color) 
       if (color!='#808080')
         targetmachine.square.stroke('black')
+      else
+        targetmachine.square.stroke('orange')
     } else {
       console.log("machine with ID", id, "not found.");
     }
