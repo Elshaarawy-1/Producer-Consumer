@@ -91,11 +91,9 @@ export default {
       try {
         const data = JSON.parse(event.data);
 
-        // Handle WebSocket message based on the received data
         if (data.type === "colorChange") {
           this.handleColorChange(data.shapeId, data.newColor);
         } else if (data.type === "otherMessageType") {
-          // Handle other types of messages
         }
       } catch (error) {
         console.error("Error parsing WebSocket message:", error);
@@ -103,7 +101,6 @@ export default {
     },
 
     isItemActive(value) {
-      // return value !== 'add' && value !== 'minus';
       if (
         value === "add" ||
         value === "minus" ||
@@ -125,7 +122,6 @@ export default {
       } else {
         this.selectedShape = item.value;
       }
-      // Clear start and end shapes when a menu item is clicked
       this.startShape = null;
       this.endShape = null;
       this.lastshapeclicked = null;
@@ -149,9 +145,6 @@ export default {
               "Content-Type": "application/json",
             },
           })
-          .then((response) => {
-            console.log(response);
-          })
           .catch((error) => {
             console.error(error);
           });
@@ -160,9 +153,6 @@ export default {
     replay() {
       axios
         .post("http://localhost:8081/replay", {})
-        .then((response) => {
-          console.log(response);
-        })
         .catch((error) => {
           console.error(error);
         });
@@ -213,33 +203,23 @@ export default {
     },
     async drawCircle(x, y) {
       try {
-        // Make an asynchronous request to the backend
         const response = await axios.get("http://localhost:8081/add/queue");
-
-        // Extract the ID from the response data
         const circleID = response.data;
-        // const circleID = 1;
-        console.log(circleID);
-
-        // Create the Konva circle
         const circle = new Konva.Circle({
           x,
           y,
           radius: 25,
           fill: "orange",
-          id: "Q" + circleID, // will be used to identify the circle later
+          id: "Q" + circleID,
           draggable: false,
         });
 
-        // Attach click event handler to the circle
         circle.on("click", () => {
           this.handleShapeClick(circle);
         });
 
-        // Add the circle to the layer
         this.layer.add(circle);
 
-        // Create the Konva text
         const text = new Konva.Text({
           x,
           y,
@@ -253,18 +233,14 @@ export default {
         text.offsetX(text.width() / 2);
         text.offsetY(text.height() / 2);
 
-        // Attach click event handler to the text
         text.on("click", () => {
           this.handleShapeClick(circle);
         });
 
-        // Add the text to the layer
         this.layer.add(text);
 
-        // Redraw the stage
         this.stage.draw();
 
-        // Add the circle and text information to the circles array
         this.circles.push({ id: circleID, circle, text });
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -273,36 +249,27 @@ export default {
 
     async drawSquare(x, y) {
       try {
-        // Make an asynchronous request to the backend
         const response = await axios.get("http://localhost:8081/add/machine");
 
-        // Extract the ID from the response data
         const squareID = response.data;
-        // const squareID = 1;
-        console.log(squareID);
-
-        // Create the Konva square
         const square = new Konva.Rect({
           x,
           y,
           width: 50,
           height: 50,
-          id: "M" + squareID, // will be used to identify the square later
+          id: "M" + squareID, 
           fill: "#808080",
           stroke: "orange",
           strokeWidth: 6,
           draggable: false,
         });
 
-        // Attach click event handler to the square
         square.on("click", () => {
           this.handleShapeClick(square);
         });
 
-        // Add the square to the layer
         this.layer.add(square);
 
-        // Create the Konva text
         const text = new Konva.Text({
           x: x + 25,
           y: y + 25,
@@ -317,25 +284,20 @@ export default {
         text.offsetX(text.width() / 2);
         text.offsetY(text.height() / 2);
 
-        // Attach click event handler to the text
         text.on("click", () => {
           this.handleShapeClick(square);
         });
 
-        // Add the text to the layer
         this.layer.add(text);
 
-        // Redraw the stage
         this.stage.draw();
 
-        // Add the square and text information to the squares array
         this.squares.push({ id: squareID, square, text });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
     handleShapeClick(shape) {
-      console.log("Shape clicked");
       this.lastshapeclicked = shape;
     },
     handleConnectClick(clickX, clickY) {
@@ -354,7 +316,6 @@ export default {
       }
     },
     drawArrow(startShape, endShape) {
-      console.log(startShape, endShape);
       const dx = endShape.x() - startShape.x();
       const dy = endShape.y() - startShape.y();
       let angle = Math.atan2(-dy, dx);
@@ -418,14 +379,11 @@ export default {
             }
           )
           .then((response) => {
-            console.log(response);
-            console.log(startShape, endShape);
             this.drawArrow(startShape, endShape);
           })
           .catch((error) => {
             console.error(error);
           });
-        console.log(this.startShape, this.endShape);
       } else {
         this.startShape = null;
         this.endShape = null;
@@ -433,13 +391,11 @@ export default {
       }
     },
     update_queue(id, queueproducts) {
-      // usage->>> update_queue(3,5)
       const targetCircle = this.circles.find(
         (circleObj) => circleObj.id === id
       );
 
       if (targetCircle) {
-        console.log("Required circle:", targetCircle.circle);
         targetCircle.text.text(["Q" + id, queueproducts].join("\n"));
       } else {
         console.log("Circle with ID", id, "not found.");
@@ -448,12 +404,10 @@ export default {
       return targetCircle.circle;
     },
     update_machine(id, color) {
-      // usage->>> update_machine(2,'red')
       const targetmachine = this.squares.find(
         (squareObj) => squareObj.id === id
       );
       if (targetmachine) {
-        console.log("Required machine:", targetmachine.square);
         targetmachine.square.fill(color);
         if (color != "#808080") targetmachine.square.stroke("black");
         else targetmachine.square.stroke("orange");
@@ -476,31 +430,21 @@ export default {
     this.stompClient = Stomp.over(new WebSocket("ws://localhost:8081/ws"));
 
     this.stompClient.connect({}, (frame) => {
-      console.log("Connected to WebSocket:", frame);
 
-      // Subscribe to "/app/simulation" destination
       this.stompClient.subscribe("/topic/ws/simulation", (message) => {
-        // Handle incoming messages
         const simulationUpdate = JSON.parse(message.body);
         const UpdatedQueue = simulationUpdate["queueMementos"];
         const UpdatedMachine = simulationUpdate["machineMementos"];
         UpdatedQueue.forEach((element) => {
           this.update_queue(element["id"], element["numberOfProducts"]);
-          console.log(element["id"], element["numberOfProducts"]);
         });
         UpdatedMachine.forEach((element) => {
           this.update_machine(element["id"], element["color"]);
-          console.log(element["id"], element["color"]);
         });
-        // console.log('Received simulation update:', simulationUpdate);
-
-        // Update the component state with the new simulation data
-        // this.simulationUpdates.push(simulationUpdate);
       });
     });
   },
   beforeUnmount() {
-    // Disconnect from WebSocket when the component is destroyed
     if (this.stompClient) {
       this.stompClient.disconnect();
     }
