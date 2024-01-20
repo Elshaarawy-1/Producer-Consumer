@@ -1,13 +1,11 @@
 package com.csed.producerconsumer.Clients;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class WebSocketController {
+public class WebSocketController implements SimulationUpdateListener {
 
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -16,7 +14,7 @@ public class WebSocketController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    @MessageMapping("/update")
+    @Override
     public void updateSimulation(SimulationMemento memento) {
         System.out.println("Inside updateSimulation WS");
         messagingTemplate.convertAndSend("/topic/ws/simulation", memento);

@@ -19,11 +19,11 @@ public class SimulationService {
     private int totalProducts = 0;
     private static ReplayCareTaker careTaker;
 
-    private final WebSocketController webSocketController;
+    private final SimulationUpdateListener updateListener;
     @Autowired
-    public SimulationService(WebSocketController webSocketController){
-        this.webSocketController = webSocketController;
-        careTaker = new ReplayCareTaker(this, webSocketController);
+    public SimulationService(SimulationUpdateListener updateListener){
+        this.updateListener = updateListener;
+        careTaker = new ReplayCareTaker(this, updateListener);
     }
     @PostConstruct
     public void initialize() {
@@ -197,6 +197,6 @@ public class SimulationService {
         totalProducts = 0;
 
         // Create a new instance of ReplayCareTaker with the new WebSocketController
-        careTaker = new ReplayCareTaker(this, webSocketController);
+        careTaker = new ReplayCareTaker(this, updateListener);
     }
 }

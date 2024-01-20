@@ -1,7 +1,6 @@
 package com.csed.producerconsumer.Clients;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -11,26 +10,24 @@ import java.util.List;
 public class ReplayCareTaker implements MachineObserver{
     private final List<SimulationMemento> mementos = new ArrayList<>();
     private SimulationService service;
-    private final WebSocketController webSocketController;
+    private final SimulationUpdateListener updateListener;
 
     @Autowired
-    ReplayCareTaker(SimulationService service, WebSocketController webSocketController){
-        this.service=service;
-        this.webSocketController=webSocketController;
+    ReplayCareTaker(SimulationService service, SimulationUpdateListener updateListener) {
+        this.service = service;
+        this.updateListener = updateListener;
     }
     @Override
     public void update(Machine machine) {
         Queue inputQ=machine.getInputQueue();
         Queue outputQ=machine.getOutputQueue();
         service.updateQueueById(inputQ.getId(), inputQ);
-        service.updateQueueById(inputQ.getId(), outputQ);
+        service.updateQueueById(outputQ.getId(), outputQ);
         service.updateMachineById(machine.getId(),machine);
-        synchronized (mementos) {
-            saveSnapshot();
-        }
+        saveSnapshot();
         SimulationMemento memento = service.takeSnapshot();
         System.out.println("Calling updateSimulation");
-        webSocketController.updateSimulation(memento);
+        updateListener.updateSimulation(memento);
     }
     public void saveSnapshot()
     {
