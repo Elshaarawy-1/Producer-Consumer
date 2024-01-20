@@ -419,6 +419,9 @@ export default {
     },
   },
   mounted() {
+    axios.get("http://localhost:8081/clear", {}).catch((error) => {
+      console.error(error);
+    });
     this.stage = new Konva.Stage({
       container: "konva-container",
       width: window.innerWidth,
