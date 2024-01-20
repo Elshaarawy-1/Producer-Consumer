@@ -33,7 +33,7 @@ public class Queue {
         return products.removeFirst();
     }
 
-    // Additional method to get the current number of products in the queue
+    // method to get the current number of products in the queue
     public synchronized int getCurrentNumberOfProducts() {
         return products.size();
     }

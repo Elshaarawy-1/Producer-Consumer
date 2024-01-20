@@ -16,7 +16,6 @@ public class SimulationService {
     int machineId = 1;
     int queueId=0;
     private static SimulationService service;
-    private int totalProducts = 0;
     private static ReplayCareTaker careTaker;
 
     private final SimulationUpdateListener updateListener;
@@ -98,7 +97,6 @@ public class SimulationService {
             machine.setOutputQueues(new_output);
             machines.put(machine.getId(),machine);
         }
-        totalProducts=numberOfProducts;
         careTaker.saveSnapshot();
     }
 
@@ -214,7 +212,6 @@ public class SimulationService {
         isSimulationRunning = false;
         machineId = 1;
         queueId = 0;
-        totalProducts = 0;
 
         // Create a new instance of ReplayCareTaker with the new WebSocketController
         careTaker = new ReplayCareTaker(this, updateListener);

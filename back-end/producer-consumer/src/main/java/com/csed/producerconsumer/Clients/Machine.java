@@ -1,10 +1,8 @@
 package com.csed.producerconsumer.Clients;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class Machine implements Runnable {
     private int id;
@@ -80,8 +78,6 @@ public class Machine implements Runnable {
                 this.currentColor = product.getColor();
                 notifyObservers();
 
-                //printMachineState();
-
                 // Simulate processing time
                 try {
                     Thread.sleep(machineServiceTime);
@@ -101,11 +97,6 @@ public class Machine implements Runnable {
 
                 notifyObservers();
                 notify(); // Notify waiting threads that the machine is ready
-
-                // Notify the UI or other components about the simulation state
-                //printMachineState();
-                // You may use observers or other mechanisms for this purpose
-                // notifySimulationUpdate()
             }
         }
     }
