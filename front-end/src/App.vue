@@ -25,7 +25,7 @@
         <v-list density="compact" nav>
           <v-tooltip v-for="item in menuItems" :key="item.value" :label="item.title" position="right">
             <template v-slot:activator="{ props }">
-              <v-list-item v-bind="props" :active="isItemActive(item.value)" :prepend-icon="item.icon" :title="item.title" :value="item.value" @click="handleMenuItemClick(item)" >
+              <v-list-item style="margin-top:180%;" v-bind="props" :active="isItemActive(item.value)" :prepend-icon="item.icon" :title="item.title" :value="item.value" @click="handleMenuItemClick(item)" >
               </v-list-item>
             </template>
             <span>{{item.title}}</span>
