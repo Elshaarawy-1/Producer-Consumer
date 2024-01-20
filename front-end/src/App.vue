@@ -219,8 +219,9 @@ export default {
           x,
           y,
           text: 'Q' + circleID,
-          fontSize: 12,
+          fontSize: 14,
           fill: 'black',
+          fontStyle: 'bold',
           width: 40,
           align: 'center',
         });
@@ -279,8 +280,9 @@ export default {
           x: x + 25,
           y: y + 25,
           text: 'M' + squareID,
-          fontSize: 12,
+          fontSize: 14,
           fill: 'white',
+          fontStyle: 'bold',
           width: 40,
           align: 'center',
         });
