@@ -65,7 +65,6 @@ public class Machine implements Runnable {
 
             // Produce the finished product by adding it to the output queue
             outputQueue.enqueue(product);
-            SimulationService.getInstance().productProcessed();
             // Reset machine color to default
             this.currentColor = defaultColor;
 

@@ -16,7 +16,6 @@ public class SimulationService {
     int machineId = 1;
     int queueId=0;
     private static SimulationService service;
-    private int processedProducts = 0;
     private int totalProducts = 0;
     private static ReplayCareTaker careTaker;
 
@@ -186,16 +185,6 @@ public class SimulationService {
     public void updateMachineById(int id, Machine M){
         machines.put(id,M);
     }
-    public void productProcessed() {
-        synchronized (this) {
-            processedProducts++;
-
-            // Check if all products are processed
-            if (processedProducts == totalProducts) {
-                stopSimulation();
-            }
-        }
-    }
     public void resetService() {
         stopSimulation();
 
@@ -205,7 +194,6 @@ public class SimulationService {
         isSimulationRunning = false;
         machineId = 1;
         queueId = 0;
-        processedProducts = 0;
         totalProducts = 0;
 
         // Create a new instance of ReplayCareTaker with the new WebSocketController
