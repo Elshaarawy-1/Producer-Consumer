@@ -152,7 +152,7 @@ export default {
     },
     replay() {
       axios
-        .post("http://localhost:8081/replay", {})
+        .get("http://localhost:8081/replay", {})
         .catch((error) => {
           console.error(error);
         });
