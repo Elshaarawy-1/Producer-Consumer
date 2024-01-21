@@ -10,6 +10,9 @@ import java.util.List;
 public class ReplayCareTaker implements MachineObserver{
     private final List<SimulationMemento> mementos = new ArrayList<>();
     private SimulationService service;
+    private List<Long> times = new ArrayList<>();
+    private List<Long> sleepTimes = new ArrayList<>();
+
     private final SimulationUpdateListener updateListener;
 
     @Autowired
@@ -36,7 +39,30 @@ public class ReplayCareTaker implements MachineObserver{
     {
         synchronized (mementos) {
             // Add the memento to the list
+            if (mementos.isEmpty()){
+                sleepTimes.add(0L);
+                times.add(System.currentTimeMillis());
+            }
+            else {
+                long now = System.currentTimeMillis();
+                sleepTimes.add(now - times.get(times.size() - 1));
+                times.add(now);
+            }
             mementos.add(service.takeSnapshot());
         }
+    }
+    public void replaySimulation() {
+        int count = 0;
+        for (SimulationMemento memento : mementos) {
+            updateListener.updateSimulation(memento);
+            System.out.println("Inside replay");
+            try {
+                Thread.sleep(sleepTimes.get(count)); 
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            count++;
+        }
+
     }
 }

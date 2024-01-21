@@ -8,11 +8,12 @@ public class Machine implements Runnable {
     private int id;
     private List<Queue> inputQueues;
     private List<Queue> outputQueues;
-    private String defaultColor = "#808080";
+    private final String defaultColor = "#808080";
     private String currentColor;
+    private final Random random = new Random();
 
     private boolean isReady = true;
-    private long machineServiceTime;
+    private final long machineServiceTime;
     private List<MachineObserver> observers = new ArrayList<>();
 
     public Machine(int id) {
@@ -21,7 +22,8 @@ public class Machine implements Runnable {
         this.inputQueues = new ArrayList<>();
         this.outputQueues = new ArrayList<>();
         // Random processing time between 3500 and 8500 milliseconds
-        this.machineServiceTime=new Random().nextInt(3000) + 5500;
+        this.machineServiceTime=random.nextInt(3000) + 5500;
+        System.out.println("Machine " + this.id + " Service time " + this.machineServiceTime);
     }
 
     public void setInputQueues(List<Queue> inputQueues) {
@@ -38,7 +40,6 @@ public class Machine implements Runnable {
     public void addOutputQueue(Queue outputQueue) {
         this.outputQueues.add(outputQueue);
     }
-
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
@@ -51,44 +52,48 @@ public class Machine implements Runnable {
                         return; // Exit the thread if interrupted
                     }
                 }
-                // Get a list of non-empty input queues
-                List<Queue> nonEmptyInputQueues = inputQueues.stream()
-                        .filter(queue -> !(queue.getCurrentNumberOfProducts()==0))
-                        .toList();
+            }
+            // Get a list of non-empty input queues
+            List<Queue> nonEmptyInputQueues = inputQueues.stream()
+                    .filter(queue -> !(queue.getCurrentNumberOfProducts() == 0))
+                    .toList();
 
-                if (nonEmptyInputQueues.isEmpty()) {
-                    // No non-empty input queues available, wait for a while and then continue the loop
-                    try {
-                        Thread.sleep(100);
-                        continue;
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-
-                // Consume a product from a randomly selected non-empty input queue
-                Product product = null;
+            if (nonEmptyInputQueues.isEmpty()) {
+                // No non-empty input queues available, wait for a while and then continue the loop
                 try {
-                    int randomInputQueueIndex = new Random().nextInt(nonEmptyInputQueues.size());
-                    product = nonEmptyInputQueues.get(randomInputQueueIndex).dequeue();
+                    Thread.sleep(100);
+                    continue;
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            // Consume a product from a randomly selected non-empty input queue
+            Product product = null;
+            try {
+                int randomInputQueueIndex = new Random().nextInt(nonEmptyInputQueues.size());
+                product = nonEmptyInputQueues.get(randomInputQueueIndex).dequeue();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            synchronized (this) {
                 // Change machine color to product color
                 this.currentColor = product.getColor();
                 notifyObservers();
+            }
 
-                // Simulate processing time
-                try {
-                    Thread.sleep(machineServiceTime);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+            // Simulate processing time
+            try {
+                Thread.sleep(machineServiceTime);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
-                // Produce the finished product by adding it to the output queue
-                int randomOutputQueueIndex = new Random().nextInt(outputQueues.size());
-                outputQueues.get(randomOutputQueueIndex).enqueue(product);
+            // Produce the finished product by adding it to the output queue
+            int randomOutputQueueIndex = new Random().nextInt(outputQueues.size());
+            outputQueues.get(randomOutputQueueIndex).enqueue(product);
 
+            synchronized (this) {
                 // Reset machine color to default
                 this.currentColor = defaultColor;
 

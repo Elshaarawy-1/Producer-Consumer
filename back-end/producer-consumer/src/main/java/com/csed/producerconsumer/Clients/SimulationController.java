@@ -52,7 +52,8 @@ public class SimulationController {
     @GetMapping("/replay")
     public void replaySimulation(){
         SimulationService service = SimulationService.getInstance();
-        // TODO: Replay functionality
+        System.out.println("Inside Controller");
+        service.replaySimulation();
     }
     @GetMapping("/clear")
     public void clearSimulation(){

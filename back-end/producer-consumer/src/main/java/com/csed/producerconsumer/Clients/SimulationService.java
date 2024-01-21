@@ -15,6 +15,8 @@ public class SimulationService {
     private boolean isSimulationRunning;
     int machineId = 1;
     int queueId=0;
+    private final Random random = new Random();
+
     private static SimulationService service;
     private static ReplayCareTaker careTaker;
 
@@ -42,7 +44,6 @@ public class SimulationService {
             return;
         }
         Set<String> colorSet = new HashSet<>();
-        Random random = new Random();
 
         while (colorSet.size() < numberOfProducts) {
             // Generate a random RGB color
@@ -215,5 +216,9 @@ public class SimulationService {
 
         // Create a new instance of ReplayCareTaker with the new WebSocketController
         careTaker = new ReplayCareTaker(this, updateListener);
+    }
+    public void replaySimulation(){
+        System.out.println("Inside Service");
+        careTaker.replaySimulation();
     }
 }
