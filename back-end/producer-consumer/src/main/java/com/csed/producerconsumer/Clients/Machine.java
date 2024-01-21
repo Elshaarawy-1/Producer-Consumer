@@ -10,7 +10,6 @@ public class Machine implements Runnable {
     private List<Queue> outputQueues;
     private final String defaultColor = "#808080";
     private String currentColor;
-    private final Random random = new Random();
 
     private boolean isReady = true;
     private final long machineServiceTime;
@@ -21,8 +20,8 @@ public class Machine implements Runnable {
         this.currentColor=this.defaultColor;
         this.inputQueues = new ArrayList<>();
         this.outputQueues = new ArrayList<>();
-        // Random processing time between 3500 and 8500 milliseconds
-        this.machineServiceTime=random.nextInt(3000) + 5500;
+        // Random processing time between 4000 and 7000 milliseconds
+        this.machineServiceTime=new Random().nextInt(new Random().nextInt(3000)) + 4000;
         System.out.println("Machine " + this.id + " Service time " + this.machineServiceTime);
     }
 

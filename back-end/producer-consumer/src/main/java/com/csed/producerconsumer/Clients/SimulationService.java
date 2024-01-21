@@ -15,8 +15,6 @@ public class SimulationService {
     private boolean isSimulationRunning;
     int machineId = 1;
     int queueId=0;
-    private final Random random = new Random();
-
     private static SimulationService service;
     private static ReplayCareTaker careTaker;
 
@@ -47,9 +45,9 @@ public class SimulationService {
 
         while (colorSet.size() < numberOfProducts) {
             // Generate a random RGB color
-            int r = random.nextInt(256);
-            int g = random.nextInt(256);
-            int b = random.nextInt(256);
+            int r = new Random().nextInt(256);
+            int g = new Random().nextInt(256);
+            int b = new Random().nextInt(256);
 
             // Convert RGB to hexadecimal
             String hexColor = String.format("#%02X%02X%02X", r, g, b);
