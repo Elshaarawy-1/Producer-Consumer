@@ -87,19 +87,6 @@ export default {
     };
   },
   methods: {
-    handleWebSocketMessage(event) {
-      try {
-        const data = JSON.parse(event.data);
-
-        if (data.type === "colorChange") {
-          this.handleColorChange(data.shapeId, data.newColor);
-        } else if (data.type === "otherMessageType") {
-        }
-      } catch (error) {
-        console.error("Error parsing WebSocket message:", error);
-      }
-    },
-
     isItemActive(value) {
       if (
         value === "add" ||
