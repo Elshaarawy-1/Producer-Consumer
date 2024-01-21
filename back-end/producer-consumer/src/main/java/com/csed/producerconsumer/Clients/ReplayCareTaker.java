@@ -54,13 +54,14 @@ public class ReplayCareTaker implements MachineObserver{
     public void replaySimulation() {
         int count = 0;
         for (SimulationMemento memento : mementos) {
-            updateListener.updateSimulation(memento);
-            System.out.println("Inside replay");
+
             try {
-                Thread.sleep(sleepTimes.get(count)); 
+                Thread.sleep(sleepTimes.get(count));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
+            updateListener.updateSimulation(memento);
+            System.out.println("Inside replay");
             count++;
         }
 
