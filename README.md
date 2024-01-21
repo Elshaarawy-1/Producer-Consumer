@@ -35,7 +35,7 @@ The Producer/Consumer Simulation Program is designed to model an assembly line p
 
 ### 2.3 **Simulation Lifecycle**
 
-- Users initiate the simulation by specifying the number of products to be processed.\
+- Users initiate the simulation by specifying the number of products to be processed.
 
 ### 2.4 **Real-time Updates:**
 
