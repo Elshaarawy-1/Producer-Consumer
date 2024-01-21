@@ -17,6 +17,10 @@ Team Members:
 
 ---
 
+
+https://github.com/Elshaarawy-1/Producer-Consumer/assets/108885178/e4cb5ac3-76a6-4ed0-b3f9-00063795e75d
+
+
 ## ****1. Introduction****
 
 The Producer/Consumer Simulation Program is designed to model an assembly line production system consisting of processing machines (**`Ms`**) and queues (**`Qs`**). The program simulates the movement of products between different processing stages, considering random input rates, service times, and visual representation of the simulation. This report provides an overview of the program, including its features, implementation details, design patterns applied, design decisions, and user instructions.
