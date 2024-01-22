@@ -7,13 +7,10 @@
 - Program Demonstration Video Link: [https://drive.google.com/file/d/1ioYGPEyGE5MSr3_xBlS4wWmcujf97XRS/view](https://drive.google.com/file/d/1ioYGPEyGE5MSr3_xBlS4wWmcujf97XRS/view)
 
 Team Members:
-
-| Name | ID |
-| --- | --- |
-| [Ahmed Youssef Sobhy Elgoerany](https://github.com/ahmedyoussefg) | 21010217 |
-| [Ahmed Mustafa Elmorsy Amer](https://github.com/Elshaarawy-1) | 21010189 |
-| [Ali Hassan Ali Mohamed](https://github.com/alihassann191) | 21010837 |
-| [Moustafa Esam El-Sayed Amer](https://github.com/MoustafaAmer12) | 21011364 |
+- [Ahmed Youssef Sobhy Elgoerany](https://github.com/ahmedyoussefg)
+- [Ahmed Mustafa Elmorsy Amer](https://github.com/Elshaarawy-1)
+- [Ali Hassan Ali Mohamed](https://github.com/alihassann191)
+- [Moustafa Esam El-Sayed Amer](https://github.com/MoustafaAmer12)
 
 ---
 
